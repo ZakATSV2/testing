@@ -723,20 +723,19 @@ do
 			}
 		}
 
-
-		LOADER.load.logo.Image = LoaderConfig.Logo;
 		syde.theme.Accent = Config.Accent;
 		syde.theme.HitBox = Config.HitBox;
 		LOADER.load.info.build.Text = syde.Build
 
 		if LoaderConfig.Status == false then
 			LOADER.load.logo.stroke.UIStroke.Color = Color3.fromRGB(24, 24, 24)
-			LOADER.load.logo["Title/Status"].Text = 'Jannis Hub'
+			LOADER.load.logo["Title/Status"].Text = 'Archie Hub'
 		end
 
 		local statusColors = {
 			Stable = { Color = Color3.fromRGB(25, 229, 22), Text = '<font color="#24bf48">Stable</font>' },
 			Unstable = { Color = Color3.fromRGB(227, 229, 81), Text = '<font color="#e3e551">Unstable</font>' },
+			Testing = { Color = Color3.fromRGB(227, 229, 81), Text = '<font color="#0a19ecff">Testing Build</font>' },
 			Detected = { Color = Color3.fromRGB(229, 44, 47), Text = '<font color="#e52c2f">Detected</font>' },
 			Patched = { Color = Color3.fromRGB(229, 44, 47), Text = '<font color="#e52c2f">Patched</font>' }
 		}
