@@ -22,7 +22,7 @@ local Loader =          game:GetObjects("rbxassetid://110221114597158")[1]
 local Library =         game:GetObjects("rbxassetid://123800669522471")[1]
 
 Library.Enabled = false
-local loaded = false
+local Initialized = false
 
 local SydeLibrary = {
 
@@ -657,14 +657,14 @@ function SydeLibrary:Notify(Notification)
 	end)
 end
 
---[LOADER INIALIZE]
+--[SydeLoader INIALIZE]
 do
 
 	function SydeLibrary:Initialize(Config)
 		print('Syde 〡 Loader Loaded')
-		local LOADER = Loader
-		LOADER.Enabled = true
-		LOADER.Parent = coregui
+		local SydeLoader = Loader
+		SydeLoader.Enabled = true
+		SydeLoader.Parent = coregui
 
 		-- PreLoad
 		Config.Name = Config.Name or 'Syde™'
@@ -708,13 +708,13 @@ do
 
 
 		if typeof(Config.Socials) == "table" and #Config.Socials > 0 then
-			LOADER.load.Size = UDim2.new(0, 400, 0, 360)
-			LOADER.load.social.Visible = true
+			SydeLoader.load.Size = UDim2.new(0, 400, 0, 360)
+			SydeLoader.load.social.Visible = true
 
-			SydeLibrary:HidePlaceHolder(LOADER.load.social.largeblock, 'largesocial')
-			SydeLibrary:HidePlaceHolder(LOADER.load.social, 'little')
-			SydeLibrary:HidePlaceHolder(LOADER.load.social.little, 'smallblock1')
-			SydeLibrary:HidePlaceHolder(LOADER.load.social.little, 'smallblock2')
+			SydeLibrary:HidePlaceHolder(SydeLoader.load.social.largeblock, 'largesocial')
+			SydeLibrary:HidePlaceHolder(SydeLoader.load.social, 'little')
+			SydeLibrary:HidePlaceHolder(SydeLoader.load.social.little, 'smallblock1')
+			SydeLibrary:HidePlaceHolder(SydeLoader.load.social.little, 'smallblock2')
 
 			for _, social in ipairs(Config.Socials) do
 				table.insert(LoaderConfig.Socials, {
@@ -742,9 +742,9 @@ do
 			else
 				for _, social in ipairs(LoaderConfig.Socials) do
 					if social.Size == "Large" then
-						local LargeSocial = LOADER.load.social.largeblock.largesocial:Clone()
+						local LargeSocial = SydeLoader.load.social.largeblock.largesocial:Clone()
 						LargeSocial.Visible = true
-						LargeSocial.Parent = LOADER.load.social.largeblock
+						LargeSocial.Parent = SydeLoader.load.social.largeblock
 
 						if social.CopyToClip and LargeSocial:FindFirstChild("interact") then
 							LargeSocial.interact.MouseButton1Click:Connect(function()
@@ -824,10 +824,10 @@ do
 					end
 
 					if social.Size == "Small" then
-						LOADER.load.social.little.Visible = true
-						local SmallSocial = LOADER.load.social.little.smallblock1:Clone()
+						SydeLoader.load.social.little.Visible = true
+						local SmallSocial = SydeLoader.load.social.little.smallblock1:Clone()
 						SmallSocial.Visible = true
-						SmallSocial.Parent = LOADER.load.social.little
+						SmallSocial.Parent = SydeLoader.load.social.little
 
 						if social.CopyToClip and SmallSocial:FindFirstChild("interact") then
 							SmallSocial.interact.MouseButton1Click:Connect(function()
@@ -871,10 +871,10 @@ do
 			end
 
 			local function updateSize()
-				LOADER.load.Size = UDim2.new(LOADER.load.Size.X.Scale, LOADER.load.Size.X.Offset, 0,  LOADER.load.social.UIListLayout.AbsoluteContentSize.Y  + 235)
+				SydeLoader.load.Size = UDim2.new(SydeLoader.load.Size.X.Scale, SydeLoader.load.Size.X.Offset, 0,  SydeLoader.load.social.UIListLayout.AbsoluteContentSize.Y  + 235)
 			end
 
-			LOADER.load.social.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSize)
+			SydeLoader.load.social.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSize)
 
 			updateSize()
 
@@ -883,22 +883,22 @@ do
 		end
 
 		if LoaderConfig.Socials == nil then
-			LOADER.load.Size = UDim2.new(0, 400, 0, 250)
-			LOADER.load.social.Visible = false
+			SydeLoader.load.Size = UDim2.new(0, 400, 0, 250)
+			SydeLoader.load.social.Visible = false
 			TweenWorkPos = 200
 			TweenWorkDisappear = 150
 			TweenWorkAppear = 177
 		end
 
 
-		LOADER.load.logo.Image = LoaderConfig.Logo;
+		SydeLoader.load.logo.Image = LoaderConfig.Logo;
 		SydeLibrary.theme.Accent = Config.Accent;
 		SydeLibrary.theme.HitBox = Config.HitBox;
-		LOADER.load.info.build.Text = SydeLibrary.Build
+		SydeLoader.load.info.build.Text = SydeLibrary.Build
 
 		if LoaderConfig.Status == false then
-			LOADER.load.logo.stroke.UIStroke.Color = Color3.fromRGB(24, 24, 24)
-			LOADER.load.logo["Title/Status"].Text = 'Archie Hub'
+			SydeLoader.load.logo.stroke.UIStroke.Color = Color3.fromRGB(24, 24, 24)
+			SydeLoader.load.logo["Title/Status"].Text = 'Archie Hub'
 		end
 
 		local statusColors = {
@@ -910,27 +910,27 @@ do
 
 		local statusData = statusColors[LoaderConfig.Status]
 		if statusData then
-			LOADER.load.logo.stroke.UIStroke.Color = statusData.Color
-			LOADER.load.logo["Title/Status"].Text = string.format('%s  <font color="#363636">•</font>  %s', LoaderConfig.Name, statusData.Text)
+			SydeLoader.load.logo.stroke.UIStroke.Color = statusData.Color
+			SydeLoader.load.logo["Title/Status"].Text = string.format('%s  <font color="#363636">•</font>  %s', LoaderConfig.Name, statusData.Text)
 		end
 
 		local function initLoader()
-			tweenservice:Create( LOADER.load.Salt, TweenInfo.new(0.65, Enum.EasingStyle.Quint), {Size = UDim2.new(0, 25,0, 25)}):Play()
-			tweenservice:Create( LOADER.load.Salt, TweenInfo.new(0.65, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+			tweenservice:Create( SydeLoader.load.Salt, TweenInfo.new(0.65, Enum.EasingStyle.Quint), {Size = UDim2.new(0, 25,0, 25)}):Play()
+			tweenservice:Create( SydeLoader.load.Salt, TweenInfo.new(0.65, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 		end
 
 		local function TweenWorkLabel(Finish, icon, Text)
-			LOADER.load.work.Position = UDim2.new(0.5, 0,1, -40)
-			LOADER.load.work.Text = Text
-			LOADER.load.work.ImageLabel.Image = icon
-			tweenservice:Create( LOADER.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { TextTransparency = 0 }):Play()
-			tweenservice:Create( LOADER.load.work.ImageLabel, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { ImageTransparency = 0 }):Play()
-			tweenservice:Create( LOADER.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Quint), { Position = UDim2.new(0.5, 0,1, -73) }):Play()
+			SydeLoader.load.work.Position = UDim2.new(0.5, 0,1, -40)
+			SydeLoader.load.work.Text = Text
+			SydeLoader.load.work.ImageLabel.Image = icon
+			tweenservice:Create( SydeLoader.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { TextTransparency = 0 }):Play()
+			tweenservice:Create( SydeLoader.load.work.ImageLabel, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { ImageTransparency = 0 }):Play()
+			tweenservice:Create( SydeLoader.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Quint), { Position = UDim2.new(0.5, 0,1, -73) }):Play()
 			--	tweenservice:Create(game.Workspace.Camera, TweenInfo.new(1, Enum.EasingStyle.Exponential), { FieldOfView  = game.Workspace.Camera.FieldOfView - 3 }):Play()
 			task.wait(Finish)
-			tweenservice:Create( LOADER.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { TextTransparency = 1 }):Play()
-			tweenservice:Create( LOADER.load.work.ImageLabel, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { ImageTransparency = 1 }):Play()
-			tweenservice:Create( LOADER.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Quint), { Position = UDim2.new(0.5, 0,1, -100) }):Play()
+			tweenservice:Create( SydeLoader.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { TextTransparency = 1 }):Play()
+			tweenservice:Create( SydeLoader.load.work.ImageLabel, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), { ImageTransparency = 1 }):Play()
+			tweenservice:Create( SydeLoader.load.work, TweenInfo.new(0.5, Enum.EasingStyle.Quint), { Position = UDim2.new(0.5, 0,1, -100) }):Play()
 			task.wait(0.6)
 
 			-- reset
@@ -975,7 +975,7 @@ do
 
 
 			TweenWorkLabel(1,'rbxassetid://105810189969774', '[STAGE 1]: Cleaning Things Up...')
-			local UI_TAG = "sydeUILoader"
+			local UI_TAG = "SydeLoader"
 			local MARKER_NAME = "SYDEUIDetector"
 			local INTERNAL_UUID = ("SYDE-" .. tostring(game.JobId):gsub("-", "") .. tostring(tick())):gsub("%.", "")
 			local PROTECTION_EVENT = Instance.new("BindableEvent")
@@ -1130,20 +1130,20 @@ do
             TweenWorkLabel(1,'rbxassetid://126745165401124', '[STAGE 3]: Loading Functions..')
 			TweenWorkLabel(1,'rbxassetid://136405833725573', '[STAGE 4]: Loading UI...')
 			task.wait(1)
-			loaded = true
-			tweenservice:Create( LOADER.load.Salt, TweenInfo.new(0.65, Enum.EasingStyle.Quint), {Size = UDim2.new(0, 146,0, 25)}):Play()
-			tweenservice:Create( LOADER.load.Salt.ImageLabel, TweenInfo.new(0.65, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+			Initialized = true
+			tweenservice:Create( SydeLoader.load.Salt, TweenInfo.new(0.65, Enum.EasingStyle.Quint), {Size = UDim2.new(0, 146,0, 25)}):Play()
+			tweenservice:Create( SydeLoader.load.Salt.ImageLabel, TweenInfo.new(0.65, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
 		end
 
 		local TimeTillLoad = 1.5
 
 		while TimeTillLoad > 0 do
-			LOADER.load.info.TimeTill.Text = string.format("%.2f", TimeTillLoad) 
+			SydeLoader.load.info.TimeTill.Text = string.format("%.2f", TimeTillLoad) 
 			task.wait(0.01) 
 			TimeTillLoad -= 0.01 
 		end
 
-		LOADER.load.info.TimeTill.Text = '0.00'
+		SydeLoader.load.info.TimeTill.Text = '0.00'
 
 		task.wait(TimeTillLoad)
 
@@ -1155,7 +1155,7 @@ do
 		Library.Enabled = true
 
 
-		LOADER:Destroy()
+		SydeLoader:Destroy()
 
 	end
 
@@ -1348,8 +1348,8 @@ function SydeLibrary:Init(library)
 
 	Library.Enabled = true
 
-	if loaded == false then
-		local UI_TAG = "sydeUILoader"
+	if Initialized == false then
+		local UI_TAG = "SydeLoader"
 		local MARKER_NAME = "SYDEUIDetector"
 		local INTERNAL_UUID = ("SYDE-" .. tostring(game.JobId):gsub("-", "") .. tostring(tick())):gsub("%.", "")
 		local PROTECTION_EVENT = Instance.new("BindableEvent")
@@ -6190,9 +6190,9 @@ function SydeLibrary:Init(library)
 
 		end
 
-		function syde:LoadSaveConfig()
+		function SydeLibrary:LoadSaveConfig()
 			local notified = false
-			local loaded = false
+			local Initialized = false
 
 			if syde.ConfigEnabled then
 				local success, result = pcall(function()
