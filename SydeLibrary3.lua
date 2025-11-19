@@ -24,12 +24,12 @@ local Library =         game:GetObjects("rbxassetid://123800669522471")[1]
 Library.Enabled = false
 local loaded = false
 
-local syde = {
+local SydeLibrary = {
 
 	theme = {
 		['Accent'] = Color3.fromRGB(255, 255, 255);
 		['HitBox'] = Color3.fromRGB(255, 255, 255);
-		['DropShadow']   = Color3.fromRGB(0, 0, 0);
+		['DropShadow']   = Color3.fromRGB(0, 8, 255);
 
 	};
 	Connections = {};
@@ -45,7 +45,7 @@ local syde = {
 
 
 -- [ THEME MANAGEMENT ]
-function syde:UpdateTheme(Config)
+function SydeLibrary:UpdateTheme(Config)
 	if type(Config) ~= "table" then
 		warn("[UpdateTheme] Invalid configuration table")
 		return
@@ -79,7 +79,7 @@ function syde:UpdateTheme(Config)
 	end
 end
 
-function syde:DeepMerge(target, source)
+function SydeLibrary:DeepMerge(target, source)
 	for k, v in pairs(source) do
 		if type(v) == "table" and type(target[k]) == "table" then
 			self:DeepMerge(target[k], v) 
@@ -91,7 +91,7 @@ end
 
 -- [UTILITIES]
 
-function syde:getdark(Color, val, mode)
+function SydeLibrary:getdark(Color, val, mode)
 	if typeof(Color) ~= "Color3" or type(val) ~= "number" then
 		warn("[getdark] Invalid input: Expected (Color3, number)")
 		return Color
@@ -110,7 +110,7 @@ function syde:getdark(Color, val, mode)
 	return Color3.fromHSV(H, S, V)
 end
 
-function syde:HidePlaceHolder(instance, placeholder, recursive)
+function SydeLibrary:HidePlaceHolder(instance, placeholder, recursive)
 	if typeof(instance) ~= "Instance" or type(placeholder) ~= "string" then
 		warn("[removeplaceholder] Invalid input: Expected (Instance, string)")
 		return
@@ -139,7 +139,7 @@ function syde:HidePlaceHolder(instance, placeholder, recursive)
 	end
 end
 
-function syde:AddConnection(Type, Callback)
+function SydeLibrary:AddConnection(Type, Callback)
 	if typeof(Type) ~= "RBXScriptSignal" then
 		error("[AddConnection] Invalid Type: Expected RBXScriptSignal, got " .. typeof(Type))
 	end
@@ -150,17 +150,17 @@ function syde:AddConnection(Type, Callback)
 	local Connection = Type:Connect(Callback)
 	local ConnectionData = { Connection = Connection }
 
-	syde.Connections = syde.Connections or {}
-	table.insert(syde.Connections, ConnectionData)
+	SydeLibrary.Connections = SydeLibrary.Connections or {}
+	table.insert(SydeLibrary.Connections, ConnectionData)
 
 	local function Disconnect()
 		if Connection.Connected then
 			Connection:Disconnect()
 		end
 
-		for i = #syde.Connections, 1, -1 do
-			if syde.Connections[i] == ConnectionData then
-				table.remove(syde.Connections, i)
+		for i = #SydeLibrary.Connections, 1, -1 do
+			if SydeLibrary.Connections[i] == ConnectionData then
+				table.remove(SydeLibrary.Connections, i)
 				break
 			end
 		end
@@ -168,9 +168,9 @@ function syde:AddConnection(Type, Callback)
 
 	task.spawn(function()
 		task.wait(10)
-		for i = #syde.Connections, 1, -1 do
-			if not syde.Connections[i].Connection.Connected then
-				table.remove(syde.Connections, i)
+		for i = #SydeLibrary.Connections, 1, -1 do
+			if not SydeLibrary.Connections[i].Connection.Connected then
+				table.remove(SydeLibrary.Connections, i)
 			end
 		end
 	end)
@@ -178,7 +178,7 @@ function syde:AddConnection(Type, Callback)
 	return Connection, Disconnect
 end
 
-function syde:MakeResizable(Dragger, Object, MinSize, Callback, LockAspectRatio)
+function SydeLibrary:MakeResizable(Dragger, Object, MinSize, Callback, LockAspectRatio)
 	assert(typeof(Dragger) == "Instance" and Dragger:IsA("GuiObject"), "[MakeResizable] Dragger must be a GuiObject")
 	assert(typeof(Object) == "Instance" and Object:IsA("GuiObject"), "[MakeResizable] Object must be a GuiObject")
 	assert(typeof(MinSize) == "Vector2", "[MakeResizable] MinSize must be a Vector2")
@@ -246,14 +246,14 @@ function syde:MakeResizable(Dragger, Object, MinSize, Callback, LockAspectRatio)
 		end
 	end
 
-	syde:AddConnection(Dragger.InputBegan, onInputBegan)
-	syde:AddConnection(userInput.InputChanged, onInputChanged)
-	syde:AddConnection(Dragger.InputEnded, onInputEnded)
+	SydeLibrary:AddConnection(Dragger.InputBegan, onInputBegan)
+	SydeLibrary:AddConnection(userInput.InputChanged, onInputChanged)
+	SydeLibrary:AddConnection(Dragger.InputEnded, onInputEnded)
 end
 
 local loadTweens = {}
 
-function syde:registerLoadTween(object, properties, initialState, tweenInfo)
+function SydeLibrary:registerLoadTween(object, properties, initialState, tweenInfo)
 	assert(typeof(object) == "Instance", "[registerLoadTween] Object must be an Instance")
 	assert(typeof(properties) == "table", "[registerLoadTween] Properties must be a table")
 	assert(typeof(initialState) == "table", "[registerLoadTween] Initial state must be a table")
@@ -267,7 +267,7 @@ function syde:registerLoadTween(object, properties, initialState, tweenInfo)
 	}
 end
 
-function syde:resetToInitialState(animated, resetTweenInfo)
+function SydeLibrary:resetToInitialState(animated, resetTweenInfo)
 	for object, tweenData in pairs(loadTweens) do
 		if object and object.Parent then
 			tweenData.tween:Cancel()
@@ -286,8 +286,8 @@ function syde:resetToInitialState(animated, resetTweenInfo)
 	end
 end
 
-function syde:replayLoadTweens(targetObject)
-	syde:resetToInitialState(false)
+function SydeLibrary:replayLoadTweens(targetObject)
+	SydeLibrary:resetToInitialState(false)
 
 	for object, tweenData in pairs(loadTweens) do
 		if object and object.Parent then
@@ -299,14 +299,14 @@ function syde:replayLoadTweens(targetObject)
 	end
 end
 
-function syde:removeLoadTween(object)
+function SydeLibrary:removeLoadTween(object)
 	if loadTweens[object] then
 		loadTweens[object].tween:Cancel()
 		loadTweens[object] = nil
 	end
 end
 
-function syde:ColorPack(color)
+function SydeLibrary:ColorPack(color)
 	assert(typeof(color) == "Color3", "PackColor expects a Color3 value.")
 
 	-- Convert to RGB integer values
@@ -317,7 +317,7 @@ function syde:ColorPack(color)
 	}
 end
 
-function syde:ColorUnpack(color)
+function SydeLibrary:ColorUnpack(color)
 	assert(type(color) == "table" or type(color) == "string", "Invalid color format. Expected table (RGB) or string (HEX).")
 
 	if type(color) == "table" then
@@ -336,7 +336,7 @@ end
 
 
 
-function syde:updateLayout(container, spacing)
+function SydeLibrary:updateLayout(container, spacing)
 	spacing = spacing or 5
 	local yOffset = 0
 	local containerWidth = container.AbsoluteSize.X 
@@ -365,7 +365,7 @@ end
 local dragSpeed = 0.6
 local LockToScreen = false
 
-function syde:AddDrag(Object, Main, ConstrainToParent)
+function SydeLibrary:AddDrag(Object, Main, ConstrainToParent)
 	assert(typeof(Object) == "Instance" and Object:IsA("GuiObject"), "[AddDrag] Object must be a GuiObject")
 	assert(typeof(Main) == "Instance" and Main:IsA("GuiObject"), "[AddDrag] Main must be a GuiObject")
 
@@ -410,7 +410,7 @@ function syde:AddDrag(Object, Main, ConstrainToParent)
 
 
 
-	syde:AddConnection(Object.InputBegan, function(input)
+	SydeLibrary:AddConnection(Object.InputBegan, function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			startMousePos = getInputPos(input)
@@ -425,7 +425,7 @@ function syde:AddDrag(Object, Main, ConstrainToParent)
 	end)
 
 
-	syde:AddConnection(userInput.InputChanged, function(input)
+	SydeLibrary:AddConnection(userInput.InputChanged, function(input)
 		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 			local currentMousePos = getInputPos(input)
 			if currentMousePos and startMousePos then
@@ -441,7 +441,7 @@ function syde:AddDrag(Object, Main, ConstrainToParent)
 		end
 	end)
 
-	syde:AddConnection(Object.InputEnded, function(input)
+	SydeLibrary:AddConnection(Object.InputEnded, function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = false
 		end
@@ -473,7 +473,7 @@ end
 
 local activeModals = 0 -- track how many modals are currently open
 
-function syde:Modal(Modal)
+function SydeLibrary:Modal(Modal)
 	task.spawn(function()
 		local ModalData = {
 			Title = Modal.Title;
@@ -583,7 +583,7 @@ function syde:Modal(Modal)
 	end)
 end
 
-function syde:Notify(Notification)
+function SydeLibrary:Notify(Notification)
 	task.spawn(function()
 
 		local NotifData = {
@@ -660,8 +660,8 @@ end
 --[LOADER INIALIZE]
 do
 
-	function SydeUI:Load(Config)
-		print('Syde 〡 Loader Initialized')
+	function SydeLibrary:Initialize(Config)
+		print('Syde 〡 Loader Loaded')
 		local LOADER = Loader
 		LOADER.Enabled = true
 		LOADER.Parent = coregui
@@ -671,16 +671,16 @@ do
 		Config.Logo = Config.Logo or 'rbxassetid://14554547135'
 		Config.ConfigFolder = Config.ConfigFolder or 'syde'
 		Config.Status = Config.Status or false
-		Config.Accent = Config.Accent or syde.theme.Accent
-		Config.HitBox = Config.HitBox or syde.theme.HitBox
+		Config.Accent = Config.Accent or SydeLibrary.theme.Accent
+		Config.HitBox = Config.HitBox or SydeLibrary.theme.HitBox
 
 		local LoaderConfig = {
 			Name = Config.Name;
 			Logo = 'rbxassetid://'..Config.Logo;
 			ConfigFolder = Config.ConfigFolder;
 			Status = Config.Status;
-			Accent = Config.Accent or syde.theme.Accent;
-			Hitbox = Config.HitBox or syde.theme.HitBox;
+			Accent = Config.Accent or SydeLibrary.theme.Accent;
+			Hitbox = Config.HitBox or SydeLibrary.theme.HitBox;
 			Socials = {}
 		}
 
@@ -711,10 +711,10 @@ do
 			LOADER.load.Size = UDim2.new(0, 400, 0, 360)
 			LOADER.load.social.Visible = true
 
-			syde:HidePlaceHolder(LOADER.load.social.largeblock, 'largesocial')
-			syde:HidePlaceHolder(LOADER.load.social, 'little')
-			syde:HidePlaceHolder(LOADER.load.social.little, 'smallblock1')
-			syde:HidePlaceHolder(LOADER.load.social.little, 'smallblock2')
+			SydeLibrary:HidePlaceHolder(LOADER.load.social.largeblock, 'largesocial')
+			SydeLibrary:HidePlaceHolder(LOADER.load.social, 'little')
+			SydeLibrary:HidePlaceHolder(LOADER.load.social.little, 'smallblock1')
+			SydeLibrary:HidePlaceHolder(LOADER.load.social.little, 'smallblock2')
 
 			for _, social in ipairs(Config.Socials) do
 				table.insert(LoaderConfig.Socials, {
@@ -892,13 +892,13 @@ do
 
 
 		LOADER.load.logo.Image = LoaderConfig.Logo;
-		syde.theme.Accent = Config.Accent;
-		syde.theme.HitBox = Config.HitBox;
-		LOADER.load.info.build.Text = syde.Build
+		SydeLibrary.theme.Accent = Config.Accent;
+		SydeLibrary.theme.HitBox = Config.HitBox;
+		LOADER.load.info.build.Text = SydeLibrary.Build
 
 		if LoaderConfig.Status == false then
 			LOADER.load.logo.stroke.UIStroke.Color = Color3.fromRGB(24, 24, 24)
-			LOADER.load.logo["Title/Status"].Text = 'Jannis Hub'
+			LOADER.load.logo["Title/Status"].Text = 'Archie Hub'
 		end
 
 		local statusColors = {
@@ -938,16 +938,16 @@ do
 		end
 
 		local function load()
-			TweenWorkLabel(1,'rbxassetid://136002400178503', 'Verifying Configuration...')
+			TweenWorkLabel(1,'rbxassetid://136002400178503', '[STAGE 1]: Verifying Configuration...')
 
 			if Config.ConfigurationSaving and Config.ConfigurationSaving.Enabled then
 				local folderName = Config.ConfigurationSaving.FolderName or "SydeSec"
 				local fileName = Config.ConfigurationSaving.FileName or "default_config"
 				local fullPath = folderName .. "/" .. fileName .. ".lua"
 
-				syde.ConfigEnabled = true
-				syde.ConfigFolder = folderName  
-				syde.ConfigFile = fileName     
+				SydeLibrary.ConfigEnabled = true
+				SydeLibrary.ConfigFolder = folderName  
+				SydeLibrary.ConfigFile = fileName     
 
 				-- Ensure folder exists
 				if isfolder and not isfolder(folderName) then
@@ -974,7 +974,7 @@ do
 			end
 
 
-			TweenWorkLabel(1,'rbxassetid://105810189969774', 'Cleaning Things Up...')
+			TweenWorkLabel(1,'rbxassetid://105810189969774', '[STAGE 1]: Cleaning Things Up...')
 			local UI_TAG = "sydeUILoader"
 			local MARKER_NAME = "SYDEUIDetector"
 			local INTERNAL_UUID = ("SYDE-" .. tostring(game.JobId):gsub("-", "") .. tostring(tick())):gsub("%.", "")
@@ -1051,7 +1051,7 @@ do
 				end
 			end)
 
-			TweenWorkLabel(1,'rbxassetid://108012241529487', 'Checking For Discord...')
+			TweenWorkLabel(1,'rbxassetid://108012241529487', '[STAGE 1]: Checking For Discord...')
 
 			if Config.AutoJoinDiscord and Config.AutoJoinDiscord.Enabled then
 				local discordConfig = Config.AutoJoinDiscord
@@ -1123,7 +1123,12 @@ do
 				end
 			end
 
-			TweenWorkLabel(1,'rbxassetid://136405833725573', 'Loading UI...')
+			--- Custom Checks
+			--- TODO: Making a better check for the Checking Host or just do it on background, because if for some reason it fails, then this entire Library and the Roblox client get's fucking detonated, WHY???
+			--- rd:1548154871
+            TweenWorkLabel(0.5,'rbxassetid://136405833725573', '[STAGE 2]: Checking Host')
+            TweenWorkLabel(1,'rbxassetid://126745165401124', '[STAGE 3]: Loading Functions..')
+			TweenWorkLabel(1,'rbxassetid://136405833725573', '[STAGE 4]: Loading UI...')
 			task.wait(1)
 			loaded = true
 			tweenservice:Create( LOADER.load.Salt, TweenInfo.new(0.65, Enum.EasingStyle.Quint), {Size = UDim2.new(0, 146,0, 25)}):Play()
@@ -1160,16 +1165,16 @@ function LoadConfig(Configuration)
 	local Data = https:JSONDecode(Configuration)
 	local changed = false
 
-	for FlagName, Flag in pairs(syde.Flags) do
+	for FlagName, Flag in pairs(SydeLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
 		if FlagValue ~= nil then
 			task.spawn(function()
 
 				if Flag.Set then
-					Flag:Set(Flag.Type == "ColorPicker" and syde:ColorUnpack(FlagValue) or FlagValue)
+					Flag:Set(Flag.Type == "ColorPicker" and SydeLibrary:ColorUnpack(FlagValue) or FlagValue)
 				elseif Flag.Type == "ColorPicker" and Flag.Color then
-					Flag.Color = syde:ColorUnpack(FlagValue)
+					Flag.Color = SydeLibrary:ColorUnpack(FlagValue)
 					changed = true
 				elseif Flag.Value ~= nil then
 					Flag.Value = FlagValue
@@ -1189,12 +1194,12 @@ end
 
 
 function SaveConfig()
-	if not syde.ConfigEnabled then return end
+	if not SydeLibrary.ConfigEnabled then return end
 
 	local Data = {}
-	for i, v in pairs(syde.Flags) do
+	for i, v in pairs(SydeLibrary.Flags) do
 		if v.Type == "ColorPicker" then
-			Data[i] = syde:ColorPack(v.Color)
+			Data[i] = SydeLibrary:ColorPack(v.Color)
 		else
 			Data[i] = v.Value or v.Color or v.StarterValue or false
 		end
@@ -1202,7 +1207,7 @@ function SaveConfig()
 
 	-- Save configuration to file
 	if writefile then
-		local filePath = string.format("%s/%s.lua", syde.ConfigFolder, syde.ConfigFile)
+		local filePath = string.format("%s/%s.lua", SydeLibrary.ConfigFolder, SydeLibrary.ConfigFile)
 		writefile(filePath, https:JSONEncode(Data))
 	end
 end
@@ -1273,7 +1278,7 @@ function CloseUI()
 	tweenservice:Create(WINDOW.UserInfo.ConnectionStatus.Status.TextLabel, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {TextTransparency = 1 }):Play()
 	task.wait(0.8)
 	if UIClosed == true then
-		syde:Notify({
+		SydeLibrary:Notify({
 			Title = 'UI Is Closed',
 			Content = 'Use '.. UIToggle.Name ..' To Open Back.'
 		})
@@ -1333,13 +1338,13 @@ end
 
 
 -- [Remove PlaceHolders]
-syde:HidePlaceHolder(TABS, 'Tb')
-syde:HidePlaceHolder(PAGES, 'Page')
+SydeLibrary:HidePlaceHolder(TABS, 'Tb')
+SydeLibrary:HidePlaceHolder(PAGES, 'Page')
 
 
 --[INITIALIZATION]
 
-function syde:Init(library)
+function SydeLibrary:Init(library)
 
 	Library.Enabled = true
 
@@ -1434,8 +1439,8 @@ function syde:Init(library)
 	TOPBAR.Title.Sub.Text = Data.SubText
 
 	-- [Setup Dragging & Resizing]
-	syde:AddDrag(TOPBAR, WINDOW, true)
-	syde:MakeResizable(WINDOW.resize, WINDOW, Vector2.new(654, 428))
+	SydeLibrary:AddDrag(TOPBAR, WINDOW, true)
+	SydeLibrary:MakeResizable(WINDOW.resize, WINDOW, Vector2.new(654, 428))
 
 	-- [Initial Transparency Setup]
 	TOPBAR.Title.TextTransparency = 1
@@ -1581,7 +1586,7 @@ function syde:Init(library)
 	end)
 
 	WINDOW.Top.UHolder.Util.Close.interact.MouseButton1Click:Connect(function()
-		syde:Modal({
+		SydeLibrary:Modal({
 			Title = 'Please Confirm Below.',
 			Content = 'Are You Sure You Want To Close This UI?',
 			ConfimCallBack = function()
@@ -1632,7 +1637,7 @@ function syde:Init(library)
 		end
 	end
 	
-	syde:AddConnection(syde.Comms.Event, function(p, color)
+	SydeLibrary:AddConnection(SydeLibrary.Comms.Event, function(p, color)
 		if p == 'DropShadow' then
 			WINDOW.Shadow.ImageLabel.ImageColor3 = color
 		end
@@ -2347,7 +2352,7 @@ function syde:Init(library)
 
 				local SV, HUE = nil, nil
 
-				syde:AddConnection(SVPicker.InputBegan, function(input)
+				SydeLibrary:AddConnection(SVPicker.InputBegan, function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
 						SV = runservice.RenderStepped:Connect(function()
 							local mouse = game.Players.LocalPlayer:GetMouse()
@@ -2362,7 +2367,7 @@ function syde:Init(library)
 					end
 				end)
 
-				syde:AddConnection(SVPicker.InputEnded, function(i)
+				SydeLibrary:AddConnection(SVPicker.InputEnded, function(i)
 					if i.UserInputType == Enum.UserInputType.MouseButton1 and SV then
 						SV:Disconnect()
 						SV = nil
@@ -2370,7 +2375,7 @@ function syde:Init(library)
 					end
 				end)
 
-				syde:AddConnection(HUESlider.InputBegan, function(input)
+				SydeLibrary:AddConnection(HUESlider.InputBegan, function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
 						HUE = runservice.RenderStepped:Connect(function()
 							local mouse = game.Players.LocalPlayer:GetMouse()
@@ -2383,7 +2388,7 @@ function syde:Init(library)
 					end
 				end)
 
-				syde:AddConnection(HUESlider.InputEnded, function(i)
+				SydeLibrary:AddConnection(HUESlider.InputEnded, function(i)
 					if i.UserInputType == Enum.UserInputType.MouseButton1 and HUE then
 						HUE:Disconnect()
 						HUE = nil
@@ -2581,7 +2586,7 @@ function syde:Init(library)
 				end
 
 				if ColorPickerData.SFlag then
-					syde.SettingsFlags[ColorPickerData.SFlag] = ColorPickerData
+					SydeLibrary.SettingsFlags[ColorPickerData.SFlag] = ColorPickerData
 				end
 
 				colorpicker.color.Values.Rainbow.MouseButton1Click:Connect(ToggleRainbowEffect)
@@ -2804,7 +2809,7 @@ function syde:Init(library)
 						)
 
 						-- Register load tween
-						syde:registerLoadTween(
+						SydeLibrary:registerLoadTween(
 							Slider.slide.slideframe,
 							{Size = UDim2.new(sliderPosition, 0, 1, 0)},
 							{Size = UDim2.new(0, 100, 1, 0)},
@@ -2831,7 +2836,7 @@ function syde:Init(library)
 					end
 
 					if Options.SFlag then
-						syde.SettingsFlags[Options.SFlag] = Options
+						SydeLibrary.SettingsFlags[Options.SFlag] = Options
 					end
 
 				end
@@ -3009,7 +3014,7 @@ function syde:Init(library)
 				local fadeTween = TweenInfo.new(0.57, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
 				local function UpdateToggleUI(state)
-					local targetColor = state and syde.theme.HitBox or Color3.fromRGB(20, 20, 20)
+					local targetColor = state and SydeLibrary.theme.HitBox or Color3.fromRGB(20, 20, 20)
 					local strokeTransparency = state and 1 or 0
 					local checkTransparency = state and 0 or 1
 					local gradientTransparency = state and 0 or 1
@@ -3259,7 +3264,7 @@ function syde:Init(library)
 				end
 
 				if ToggleData.SFlag then
-					syde.SettingsFlags[ToggleData.SFlag] = ToggleData
+					SydeLibrary.SettingsFlags[ToggleData.SFlag] = ToggleData
 				end
 
 			end
@@ -3275,9 +3280,9 @@ function syde:Init(library)
 		element:ColorPicker({
 			Title = 'Accent',
 			Linkable = true,
-			Color = syde.theme.Accent;
+			Color = SydeLibrary.theme.Accent;
 			CallBack = function(v)
-				syde:UpdateTheme({
+				SydeLibrary:UpdateTheme({
 					['Accent'] = v
 				})
 			end,
@@ -3288,9 +3293,9 @@ function syde:Init(library)
 		element:ColorPicker({
 			Title = 'HitBox',
 			Linkable = true,
-			Color = syde.theme.HitBox;
+			Color = SydeLibrary.theme.HitBox;
 			CallBack = function(c)
-				syde:UpdateTheme({
+				SydeLibrary:UpdateTheme({
 					['HitBox'] = c
 				})
 			end,
@@ -3300,9 +3305,9 @@ function syde:Init(library)
 		element:ColorPicker({
 			Title = 'Drop Shadow',
 			Linkable = true,
-			Color = syde.theme.DropShadow;
+			Color = SydeLibrary.theme.DropShadow;
 			CallBack = function(c)
-				syde:UpdateTheme({
+				SydeLibrary:UpdateTheme({
 					['DropShadow'] = c
 				})
 			end,
@@ -3363,14 +3368,14 @@ function syde:Init(library)
 		}, WINDOW.Settings.Pages.Theme.Container)
 
 
-		function syde:SaveSettingsConfig()
+		function SydeLibrary:SaveSettingsConfig()
 			local Data = {}
 
 
-			for flag, v in pairs(syde.SettingsFlags or {}) do
+			for flag, v in pairs(SydeLibrary.SettingsFlags or {}) do
 
 				if v.Type == "ColorPicker" and v.Color then
-					Data[flag] = syde:ColorPack(v.Color)
+					Data[flag] = SydeLibrary:ColorPack(v.Color)
 				elseif v.Value ~= nil then
 					Data[flag] = v.Value
 				elseif v.StarterValue ~= nil then
@@ -3381,23 +3386,23 @@ function syde:Init(library)
 			end
 
 
-			local path = string.format("%s/SettingsConfig.lua", syde.ConfigFolder)
+			local path = string.format("%s/SettingsConfig.lua", SydeLibrary.ConfigFolder)
 			local encoded = https:JSONEncode(Data)
 
 			writefile(path, encoded)
 
-			syde:Notify({
+			SydeLibrary:Notify({
 				Title = 'Settings Saved',
 				Content = 'Your settings have been saved to SettingsConfig.lua',
 				Duration = 3,
 			})
 		end
 
-		function syde:LoadSettingsConfig()
-			local path = string.format("%s/SettingsConfig.lua", syde.ConfigFolder)
+		function SydeLibrary:LoadSettingsConfig()
+			local path = string.format("%s/SettingsConfig.lua", SydeLibrary.ConfigFolder)
 
 			if not isfile(path) then
-				syde:Notify({
+				SydeLibrary:Notify({
 					Title = 'No Settings Found',
 					Content = 'SettingsConfig.lua does not exist.',
 					Duration = 3,
@@ -3415,12 +3420,12 @@ function syde:Init(library)
 			end
 
 			for flag, val in pairs(data) do
-				local setting = syde.SettingsFlags and syde.SettingsFlags[flag]
+				local setting = SydeLibrary.SettingsFlags and SydeLibrary.SettingsFlags[flag]
 				if setting then
 					if setting.Set then
 						setting:Set(val)
 					elseif setting.Type == "ColorPicker" and setting.Color then
-						setting.Color = syde:ColorUnpack(val)
+						setting.Color = SydeLibrary:ColorUnpack(val)
 					elseif setting.Value ~= nil then
 						setting.Value = val
 					end
@@ -3429,7 +3434,7 @@ function syde:Init(library)
 				end
 			end
 
-			syde:Notify({
+			SydeLibrary:Notify({
 				Title = 'Settings Loaded',
 				Content = 'Loaded settings from SettingsConfig.lua.',
 				Duration = 3,
@@ -3440,7 +3445,7 @@ function syde:Init(library)
 			Title = 'Save',
 			Description = "Saves Setting Configuration",
 			CallBack = function(v)
-				syde:SaveSettingsConfig()
+				SydeLibrary:SaveSettingsConfig()
 			end,
 		},  WINDOW.Settings.Pages.Theme.Container)
 
@@ -3448,7 +3453,7 @@ function syde:Init(library)
 			Title = 'Load',
 			Description = "Loads Setting Configuration",
 			CallBack = function()
-				syde:LoadSettingsConfig()
+				SydeLibrary:LoadSettingsConfig()
 			end,
 		}, WINDOW.Settings.Pages.Theme.Container)
 
@@ -3459,7 +3464,19 @@ function syde:Init(library)
 
 		element:Paragraph({
 			Title = 'Status',
-			Content = 'Your Up To Date!'
+			Content = 'Your Up To Date! (Stable R3.6)'
+		}, WINDOW.Settings.Pages.Info.Container)
+		element:Paragraph({
+			Title = 'DEV MODE',
+			Content = 'False'
+		}, WINDOW.Settings.Pages.Info.Container)
+		element:Paragraph({
+			Title = 'Host Status',
+			Content = 'V3:TRUE'
+		}, WINDOW.Settings.Pages.Info.Container)
+		element:Paragraph({
+			Title = 'Functions Loaded',
+			Content = 'True'
 		}, WINDOW.Settings.Pages.Info.Container)
 
 		element:Toggle({
@@ -3487,40 +3504,6 @@ function syde:Init(library)
 			end,
 			SFlag = 'Anon'
 		}, WINDOW.Settings.Pages.Privacy.Container)
-		--local startTime = tick()
-
-		-- breaks ui may add later
---[[	local uptimeParagraph = element:Paragraph({
-		Title = 'Session UpTime',
-		Content = 'Calculating...'
-	}, WINDOW.Settings.Pages.Info.Container)
-
-	local function formatTime(seconds)
-		local days = math.floor(seconds / 86400)
-		seconds = seconds % 86400
-		local hours = math.floor(seconds / 3600)
-		seconds = seconds % 3600
-		local minutes = math.floor(seconds / 60)
-		seconds = math.floor(seconds % 60)
-
-		return string.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds)
-	end
-
-	local startTime = tick()
-	
-	local heartbeatConnection
-	heartbeatConnection = runservice.Heartbeat
-	
-	SettingsElements:AddConnection(heartbeatConnection, function()
-		if uptimeParagraph then
-			local uptime = tick() - startTime
-			local formatted = formatTime(uptime)
-			uptimeParagraph:Set("Server Uptime: " .. formatted)
-		else
-			heartbeatConnection:Disconnect()
-		end
-	end)]]
-
 
 	end
 
@@ -3574,23 +3557,23 @@ function syde:Init(library)
 
 		Page.ChildAdded:Connect(function(child)
 			child:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-				syde:updateLayout(Page, 7) 
+				SydeLibrary:updateLayout(Page, 7) 
 			end)
 			child:GetPropertyChangedSignal("Visible"):Connect(function()
-				syde:updateLayout(Page, 7)
+				SydeLibrary:updateLayout(Page, 7)
 			end)
-			syde:updateLayout(Page, 7)
+			SydeLibrary:updateLayout(Page, 7)
 		end)
 
 		Page.ChildRemoved:Connect(function()
-			syde:updateLayout(Page, 7)
+			SydeLibrary:updateLayout(Page, 7)
 		end)
 
 		Page:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-			syde:updateLayout(Page, 7)
+			SydeLibrary:updateLayout(Page, 7)
 		end)
 
-		syde:updateLayout(Page, 7)
+		SydeLibrary:updateLayout(Page, 7)
 
 		local function ChangeName(Name)
 			tweenservice:Create(PAGES.Clipframe.TBName, TweenInfo.new(0), { TextTransparency = PAGES.Clipframe.TBName.TextTransparency }):Play()
@@ -3645,7 +3628,7 @@ function syde:Init(library)
 			local targetSize = isSelected and UDim2.new(1, -12, 1, 0) or UDim2.new(1, -12, 1, 0)
 			local targetTextColor = isSelected and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(52, 52, 52)
 			local targetTransparency = isSelected and 0 or 1
-			local targetColor = isSelected and syde.theme.Accent or Color3.fromRGB(29, 29, 29)
+			local targetColor = isSelected and SydeLibrary.theme.Accent or Color3.fromRGB(29, 29, 29)
 			local indicatorSize = isSelected and UDim2.new(0, 2, 0, 10) or UDim2.new(0, 2, 0, 5)
 
 			tweenservice:Create(tabButton.Title, positionTweenInfo, { Size = targetSize, TextColor3 = targetTextColor }):Play()
@@ -3822,7 +3805,7 @@ function syde:Init(library)
 				end
 			end
 
-			syde:replayLoadTweens()
+			SydeLibrary:replayLoadTweens()
 
 			for _, otherTab in ipairs(TABS:GetChildren()) do
 				if otherTab:IsA("Frame") then
@@ -4239,7 +4222,7 @@ function syde:Init(library)
 			local fadeTween = TweenInfo.new(0.57, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
 			local function UpdateToggleUI(state)
-				local targetColor = state and syde.theme.HitBox or Color3.fromRGB(28, 28, 28)
+				local targetColor = state and SydeLibrary.theme.HitBox or Color3.fromRGB(28, 28, 28)
 				local strokeTransparency = state and 1 or 0
 				local checkTransparency = state and 0 or 1
 				local gradientTransparency = state and 0 or 1
@@ -4496,14 +4479,14 @@ function syde:Init(library)
 				SaveConfig()
 			end
 
-			if syde.ConfigEnabled then
+			if SydeLibrary.ConfigEnabled then
 				if ToggleData.Flag then
-					syde.Flags[ToggleData.Flag] = ToggleData
+					SydeLibrary.Flags[ToggleData.Flag] = ToggleData
 				end
 			end
 
 
-			syde:AddConnection(syde.Comms.Event, function(p, color)
+			SydeLibrary:AddConnection(SydeLibrary.Comms.Event, function(p, color)
 				if p == 'HitBox' then
 					if ToggleData.Value then
 						toggle.tog.BackgroundColor3 = color
@@ -4564,14 +4547,14 @@ function syde:Init(library)
 				--	Slider.slide.slideframe:TweenSize(UDim2.new(SliderPosition, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.5, true)
 				tweenservice:Create(Slider.slide.slideframe, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Size = UDim2.new(SliderPosition, 0, 1, 0)})
 
-				syde:registerLoadTween(
+				SydeLibrary:registerLoadTween(
 					Slider.slide.slideframe,
 					{Size = UDim2.new(SliderPosition, 0, 1, 0)},
 					{Size = UDim2.new(0, 100,1, 0)},
 					TweenInfo.new(0.85, Enum.EasingStyle.Quint)
 				)
 
-				--	syde:replayLoadTweens(Slider.slide.slideframe)
+				--	SydeLibrary:replayLoadTweens(Slider.slide.slideframe)
 
 				Slider.v.Text = string.format("<font size='14'>%d</font><font color='#434343'>/%d</font>", Options.StarterValue, Options.Range[2])
 
@@ -4590,7 +4573,7 @@ function syde:Init(library)
 						local snapPosition = (newValue - Options.Range[1]) / range
 						Slider.slide.slideframe:TweenSize(UDim2.new(snapPosition, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.55, true)
 
-						syde:registerLoadTween(
+						SydeLibrary:registerLoadTween(
 							Slider.slide.slideframe,
 							{Size = UDim2.new(snapPosition, 0, 1, 0)},
 							{Size = UDim2.new(0, 100,1, 0)},
@@ -4624,7 +4607,7 @@ function syde:Init(library)
 					dragging = false
 				end)
 
-				syde:AddConnection(userinput.InputEnded, function(input, processed)
+				SydeLibrary:AddConnection(userinput.InputEnded, function(input, processed)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch  then
 						dragging = false
 						if Slider and Slider:FindFirstChild("Title") then
@@ -4633,21 +4616,21 @@ function syde:Init(library)
 					end
 				end)
 
-				syde:AddConnection(userinput.InputChanged, function(input)
+				SydeLibrary:AddConnection(userinput.InputChanged, function(input)
 					if dragging and input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch  then
 						UpdateSlider(input.Position.X)
 					end
 				end)
 
-				Slider.slide.slideframe.BackgroundColor3 = syde.theme.HitBox
-				Slider.slide.slideframe.shadowHolder.ambientShadow.ImageColor3 = syde.theme.HitBox
-				Slider.slide.slideframe.shadowHolder.penumbraShadow.ImageColor3 = syde.theme.HitBox
-				Slider.slide.slideframe.shadowHolder.umbraShadow.ImageColor3 = syde.theme.HitBox
+				Slider.slide.slideframe.BackgroundColor3 = SydeLibrary.theme.HitBox
+				Slider.slide.slideframe.shadowHolder.ambientShadow.ImageColor3 = SydeLibrary.theme.HitBox
+				Slider.slide.slideframe.shadowHolder.penumbraShadow.ImageColor3 = SydeLibrary.theme.HitBox
+				Slider.slide.slideframe.shadowHolder.umbraShadow.ImageColor3 = SydeLibrary.theme.HitBox
 				slider.slideholder.Size = UDim2.new(1,-30,0,slider.slideholder.UIListLayout.AbsoluteContentSize.Y)
 				local ss = slider.slideholder.UIListLayout.AbsoluteContentSize.Y
 				slider.Size = UDim2.new(1,-15,0, ss  + 20)
 
-				syde:AddConnection(syde.Comms.Event, function(p, color)
+				SydeLibrary:AddConnection(SydeLibrary.Comms.Event, function(p, color)
 					if p == 'HitBox' then
 						Slider.slide.slideframe.BackgroundColor3 = color
 						Slider.slide.slideframe.shadowHolder.ambientShadow.ImageColor3 = color
@@ -4669,7 +4652,7 @@ function syde:Init(library)
 					)
 
 					-- Register load tween
-					syde:registerLoadTween(
+					SydeLibrary:registerLoadTween(
 						Slider.slide.slideframe,
 						{Size = UDim2.new(sliderPosition, 0, 1, 0)},
 						{Size = UDim2.new(0, 100, 1, 0)},
@@ -4696,9 +4679,9 @@ function syde:Init(library)
 					SaveConfig()
 				end
 
-				if syde.ConfigEnabled then
+				if SydeLibrary.ConfigEnabled then
 					if Options.Flag then
-						syde.Flags[Options.Flag] = Options
+						SydeLibrary.Flags[Options.Flag] = Options
 					end
 				end
 
@@ -5450,7 +5433,7 @@ function syde:Init(library)
 
 			local SV, HUE = nil, nil
 
-			syde:AddConnection(SVPicker.InputBegan, function(input)
+			SydeLibrary:AddConnection(SVPicker.InputBegan, function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 then
 					SV = runservice.RenderStepped:Connect(function()
 						local mouse = game.Players.LocalPlayer:GetMouse()
@@ -5465,7 +5448,7 @@ function syde:Init(library)
 				end
 			end)
 
-			syde:AddConnection(SVPicker.InputEnded, function(i)
+			SydeLibrary:AddConnection(SVPicker.InputEnded, function(i)
 				if i.UserInputType == Enum.UserInputType.MouseButton1 and SV then
 					SV:Disconnect()
 					SV = nil
@@ -5474,7 +5457,7 @@ function syde:Init(library)
 				end
 			end)
 
-			syde:AddConnection(HUESlider.InputBegan, function(input)
+			SydeLibrary:AddConnection(HUESlider.InputBegan, function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 then
 					HUE = runservice.RenderStepped:Connect(function()
 						local mouse = game.Players.LocalPlayer:GetMouse()
@@ -5487,7 +5470,7 @@ function syde:Init(library)
 				end
 			end)
 
-			syde:AddConnection(HUESlider.InputEnded, function(i)
+			SydeLibrary:AddConnection(HUESlider.InputEnded, function(i)
 				if i.UserInputType == Enum.UserInputType.MouseButton1 and HUE then
 					HUE:Disconnect()
 					HUE = nil
@@ -5732,7 +5715,7 @@ function syde:Init(library)
 			end
 
 			-- Main input handler
-			syde:AddConnection(userinput.InputBegan, function(input)
+			SydeLibrary:AddConnection(userinput.InputBegan, function(input)
 				if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
 
 				if KeybindData.WaitingForKey then
@@ -6239,4 +6222,4 @@ function syde:Init(library)
 	return ldata
 
 end
-return syde
+return SydeLibrary
