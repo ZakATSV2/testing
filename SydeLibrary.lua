@@ -53,7 +53,7 @@ local syde = {
 	Connections = {};
 	Comms = Instance.new('BindableEvent');
 	ParentOverride = nil;
-	Build = 'SY3';
+	Build = 'R3.6';
 	ConfigEnabled = false;
 	ConfigFolder = 'Syde';
 	ConfigFile = 'Config';
@@ -678,8 +678,8 @@ end
 --[LOADER INIALIZE]
 do
 
-	function syde:Load(Config)
-		print('Syde 〡 Loader Loaded')
+	function syde:initialize(Config)
+		print('Syde 〡 Loader Initialized')
 		local LOADER = Loader
 		LOADER.Enabled = true
 		LOADER.Parent = coregui
@@ -699,6 +699,7 @@ do
 			Status = Config.Status;
 			Accent = Config.Accent or syde.theme.Accent;
 			Hitbox = Config.HitBox or syde.theme.HitBox;
+			Socials = {}
 		}
 
 		local TweenWorkPos = 315
@@ -723,19 +724,204 @@ do
 			}
 		}
 
+
+		if typeof(Config.Socials) == "table" and #Config.Socials > 0 then
+			LOADER.load.Size = UDim2.new(0, 400, 0, 360)
+			LOADER.load.social.Visible = true
+
+			syde:HidePlaceHolder(LOADER.load.social.largeblock, 'largesocial')
+			syde:HidePlaceHolder(LOADER.load.social, 'little')
+			syde:HidePlaceHolder(LOADER.load.social.little, 'smallblock1')
+			syde:HidePlaceHolder(LOADER.load.social.little, 'smallblock2')
+
+			for _, social in ipairs(Config.Socials) do
+				table.insert(LoaderConfig.Socials, {
+					Name = social.Name or '@None';
+					Discord = social.Discord or 'None';
+					Style = social.Style or "Default";
+					Size = social.Size or "Medium";
+					CopyToClip = social.CopyToClip ~= nil and social.CopyToClip or true;
+				})
+			end
+
+			local largeCount, smallCount = 0, 0
+
+			for _, social in ipairs(LoaderConfig.Socials) do
+				if social.Size == "Large" then
+					largeCount += 1
+				elseif social.Size == "Small" then
+					smallCount += 1
+				end
+			end
+
+			if largeCount > 1 or smallCount > 2 then
+				warn("[SYDE] Only 1 Large block and 2 Small blocks are allowed in Socials.")
+				LoaderConfig.Socials = nil
+			else
+				for _, social in ipairs(LoaderConfig.Socials) do
+					if social.Size == "Large" then
+						local LargeSocial = LOADER.load.social.largeblock.largesocial:Clone()
+						LargeSocial.Visible = true
+						LargeSocial.Parent = LOADER.load.social.largeblock
+
+						if social.CopyToClip and LargeSocial:FindFirstChild("interact") then
+							LargeSocial.interact.MouseButton1Click:Connect(function()
+								if social.Style == 'Discord' then
+									setclipboard(social.Discord)
+								elseif social.Style == 'WebSite' then
+									setclipboard(social.Name)
+								elseif social.Style == 'GitHub' then
+									setclipboard(social.GitHub)
+								end
+							end)
+						end
+
+						-- [StyleHandle]
+						if social.Style == 'GitHub' then
+							LargeSocial.BackgroundColor3 = Styles.GitHub.BackGroundColor
+							LargeSocial.UIStroke.Color = Styles.GitHub.StrokeColor
+							LargeSocial.UIGradient.Color = Styles.GitHub.GradColor
+
+							LargeSocial.DiscordTitle.Visible  = false
+							LargeSocial.Visit.Visible = false
+
+							LargeSocial.SocialName.Position = UDim2.new(0, 45,0, 25)
+							LargeSocial.SocialName.Text = 'GitHub'
+							LargeSocial.GitName.Visible = true
+							LargeSocial.GitName.Text = '@'..social.GitHub
+							LargeSocial.ImageLabel.Image = 'rbxassetid://86992377698608'
+							LargeSocial.UIStroke.UIGradient:Destroy()
+						elseif social.Style == 'Discord' then
+							LargeSocial.BackgroundColor3 = Styles.Discord.BackGroundColor
+							LargeSocial.UIStroke.Color = Styles.Discord.StrokeColor
+							LargeSocial.UIGradient.Color = Styles.Discord.GradColor
+							LargeSocial.ImageLabel.Image = 'rbxassetid://108012241529487'
+							LargeSocial.SocialName.Text = social.Discord
+
+							if not LargeSocial.UIStroke.UIGradient then
+								local strokeGrad = Instance.new('UIGradient', LargeSocial.UIStroke)
+								strokeGrad.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(91, 125, 147))}
+								strokeGrad.Rotation = -34
+							else
+								LargeSocial.UIStroke.UIGradient.Color =  ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(91, 125, 147))}
+							end
+
+
+							LargeSocial.DiscordTitle.Visible  = true
+							LargeSocial.Visit.Visible = true
+							LargeSocial.GitName.Visible = false
+							LargeSocial.SocialName.Position = UDim2.new(0, 45,0, 30)
+							LargeSocial.Visit.Position = UDim2.new(1, -95,0.5, 0)
+							LargeSocial.Visit.ImageLabel.Visible = true
+
+						elseif social.Style == 'WebSite' then
+							LargeSocial.BackgroundColor3 = Styles.Site.BackGroundColor
+							LargeSocial.UIStroke.Color = Styles.Site.StrokeColor
+							LargeSocial.UIGradient.Color = Styles.Site.GradColor
+							LargeSocial.ImageLabel.Image = 'rbxassetid://74915074739925'
+
+							LargeSocial.DiscordTitle.Visible  = false
+							LargeSocial.Visit.Visible = true
+							LargeSocial.GitName.Visible = false
+
+							if not LargeSocial.UIStroke.UIGradient then
+								local strokeGrad = Instance.new('UIGradient', LargeSocial.UIStroke)
+								strokeGrad.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(181, 33, 225))}
+								strokeGrad.Rotation = -25
+							else
+								LargeSocial.UIStroke.UIGradient.Color =  ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(181, 33, 225))}
+							end
+
+
+							LargeSocial.SocialName.Text = social.Name
+							LargeSocial.Visit.ImageLabel.Visible = false
+							LargeSocial.Visit.TextColor3 = Color3.fromRGB(255, 255, 255)
+							LargeSocial.Visit.Text = 'Visit site'
+							LargeSocial.Visit.Position = UDim2.new(1, -80,0.5, 0)
+						end
+					end
+
+					if social.Size == "Small" then
+						LOADER.load.social.little.Visible = true
+						local SmallSocial = LOADER.load.social.little.smallblock1:Clone()
+						SmallSocial.Visible = true
+						SmallSocial.Parent = LOADER.load.social.little
+
+						if social.CopyToClip and SmallSocial:FindFirstChild("interact") then
+							SmallSocial.interact.MouseButton1Click:Connect(function()
+								--	setclipboard(social.Discord or social.Name or "No data")
+								if social.Style == 'WebSite' then
+									setclipboard(social.Name)
+								elseif social.Style == 'GitHub' then
+									setclipboard(social.GitHub)
+								end
+							end)
+						end
+
+						if social.Style == "GitHub" then
+							SmallSocial.BackgroundColor3 = Styles.GitHub.BackGroundColor
+							SmallSocial.UIStroke.Color = Styles.GitHub.StrokeColor
+							SmallSocial.UIGradient.Color = Styles.GitHub.GradColor
+
+							SmallSocial.SocialName.Text = 'GitHub'
+							SmallSocial.Text.Visible = true
+							SmallSocial.Text.TextColor3 = Color3.fromRGB(90, 90, 90)
+							SmallSocial.Text.Text = '@'..social.Name
+							SmallSocial.ImageLabel.Image = 'rbxassetid://86992377698608'
+						elseif social.Style == 'WebSite' then
+							SmallSocial.BackgroundColor3 = Styles.Site.BackGroundColor
+							SmallSocial.UIStroke.Color = Styles.Site.StrokeColor
+							SmallSocial.UIGradient.Color = Styles.Site.GradColor
+
+							SmallSocial.SocialName.Text = social.Name
+							SmallSocial.Text.Visible = true
+							SmallSocial.Text.TextColor3 = Color3.fromRGB(255, 255, 255)
+							SmallSocial.Text.Text = 'Visit Site'
+							SmallSocial.ImageLabel.Image = 'rbxassetid://74915074739925'
+							SmallSocial.ImageLabel.ImageColor3 = Color3.fromRGB(231, 160, 255)
+						end
+					end
+
+					if social.CopyToClip then
+						print('Copied')
+					end
+				end
+			end
+
+			local function updateSize()
+				LOADER.load.Size = UDim2.new(LOADER.load.Size.X.Scale, LOADER.load.Size.X.Offset, 0,  LOADER.load.social.UIListLayout.AbsoluteContentSize.Y  + 235)
+			end
+
+			LOADER.load.social.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSize)
+
+			updateSize()
+
+		else
+			LoaderConfig.Socials = nil
+		end
+
+		if LoaderConfig.Socials == nil then
+			LOADER.load.Size = UDim2.new(0, 400, 0, 250)
+			LOADER.load.social.Visible = false
+			TweenWorkPos = 200
+			TweenWorkDisappear = 150
+			TweenWorkAppear = 177
+		end
+
+
+		LOADER.load.logo.Image = LoaderConfig.Logo;
 		syde.theme.Accent = Config.Accent;
 		syde.theme.HitBox = Config.HitBox;
 		LOADER.load.info.build.Text = syde.Build
 
 		if LoaderConfig.Status == false then
 			LOADER.load.logo.stroke.UIStroke.Color = Color3.fromRGB(24, 24, 24)
-			LOADER.load.logo["Title/Status"].Text = 'Archie Hub'
+			LOADER.load.logo["Title/Status"].Text = 'Jannis Hub'
 		end
 
 		local statusColors = {
 			Stable = { Color = Color3.fromRGB(25, 229, 22), Text = '<font color="#24bf48">Stable</font>' },
 			Unstable = { Color = Color3.fromRGB(227, 229, 81), Text = '<font color="#e3e551">Unstable</font>' },
-			Testing = { Color = Color3.fromRGB(227, 229, 81), Text = '<font color="#0a19ecff">Testing Build</font>' },
 			Detected = { Color = Color3.fromRGB(229, 44, 47), Text = '<font color="#e52c2f">Detected</font>' },
 			Patched = { Color = Color3.fromRGB(229, 44, 47), Text = '<font color="#e52c2f">Patched</font>' }
 		}
