@@ -674,7 +674,7 @@ do
 		Config.Accent = Config.Accent or SydeLibrary.theme.Accent
 		Config.HitBox = Config.HitBox or SydeLibrary.theme.HitBox
 
-		local LoaderConfig = {
+		local SydeConfiguration = {
 			Name = Config.Name;
 			Logo = 'rbxassetid://'..Config.Logo;
 			ConfigFolder = Config.ConfigFolder;
@@ -688,12 +688,12 @@ do
 		local TweenWorkDisappear = 270
 
 
-		SydeLoader.load.logo.Image = LoaderConfig.Logo;
+		SydeLoader.load.logo.Image = SydeConfiguration.Logo;
 		SydeLibrary.theme.Accent = Config.Accent;
 		SydeLibrary.theme.HitBox = Config.HitBox;
 		SydeLoader.load.info.build.Text = SydeLibrary.Build
 
-		if LoaderConfig.Status == false then
+		if SydeConfiguration.Status == false then
 			SydeLoader.load.logo.stroke.UIStroke.Color = Color3.fromRGB(24, 24, 24)
 			SydeLoader.load.logo["Title/Status"].Text = 'Archie Hub'
 		end
@@ -705,10 +705,10 @@ do
 			Patched = { Color = Color3.fromRGB(229, 44, 47), Text = '<font color="#e52c2f">Patched</font>' }
 		}
 
-		local statusData = statusColors[LoaderConfig.Status]
+		local statusData = statusColors[SydeConfiguration.Status]
 		if statusData then
 			SydeLoader.load.logo.stroke.UIStroke.Color = statusData.Color
-			SydeLoader.load.logo["Title/Status"].Text = string.format('%s  <font color="#363636">•</font>  %s', LoaderConfig.Name, statusData.Text)
+			SydeLoader.load.logo["Title/Status"].Text = string.format('%s  <font color="#363636">•</font>  %s', SydeConfiguration.Name, statusData.Text)
 		end
 
 		local function initLoader()
