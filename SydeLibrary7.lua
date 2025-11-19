@@ -18,7 +18,7 @@ local camera =          workspace.CurrentCamera
 local sharedModule = {}
 local resizing = false
 
-local Loader =          game:GetObjects("rbxassetid://110221114597158")[1]
+local LibraryLoader =          game:GetObjects("rbxassetid://110221114597158")[1]
 local Library =         game:GetObjects("rbxassetid://123800669522471")[1]
 
 Library.Enabled = false
@@ -662,7 +662,7 @@ do
 
 	function SydeLibrary:Initialize(Config)
 		print('Syde 〡 Loader Loaded')
-		local SydeLoader = Loader
+		local SydeLoader = LibraryLoader
 		SydeLoader.Enabled = true
 		SydeLoader.Parent = coregui
 
