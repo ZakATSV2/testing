@@ -660,7 +660,7 @@ end
 --[LOADER INIALIZE]
 do
 
-	function SydeUI:Initialize(Config)
+	function SydeUI:Load(Config)
 		print('Syde 〡 Loader Initialized')
 		local LOADER = Loader
 		LOADER.Enabled = true
