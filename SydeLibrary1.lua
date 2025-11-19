@@ -1,21 +1,3 @@
---[[
-
-
-                        dP          
-                        88          
-.d8888b. dP    dP .d888b88 .d8888b. 
-Y8ooooo. 88    88 88'  `88 88ooood8 
-      88 88.  .88 88.  .88 88.  ... 
-`88888P' `8888P88 `88888P8 `88888P' beta.
-              .88                   
-          d8888P                    
-
-
-made with 💓 by sellessence
-]]
-
-
-
 local inputservice =	game:GetService("InsertService")
 local tweenservice = 	game:GetService("TweenService")
 local https = 			game:GetService("HttpService")
@@ -678,7 +660,7 @@ end
 --[LOADER INIALIZE]
 do
 
-	function syde:initialize(Config)
+	function SydeUI:Initialize(Config)
 		print('Syde 〡 Loader Initialized')
 		local LOADER = Loader
 		LOADER.Enabled = true
